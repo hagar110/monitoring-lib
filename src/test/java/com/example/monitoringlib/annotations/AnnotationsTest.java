@@ -28,7 +28,7 @@ public class AnnotationsTest {
         testClassService.testGaugeMeterType("test", "val");
         List<io.micrometer.core.instrument.Tag> expectedTags = new ArrayList<>(
                 Arrays.asList(io.micrometer.core.instrument.Tag.of("testTag", "test")));
-        Assertions.assertTrue(isMeterRecorded("test", 0d, expectedTags,MeterType.GAUGE));
+        Assertions.assertTrue(isMeterRecorded("test", 0d, expectedTags, MeterType.GAUGE));
     }
 
     @Test
@@ -37,7 +37,7 @@ public class AnnotationsTest {
         List<io.micrometer.core.instrument.Tag> expectedTags = new ArrayList<>(
                 Arrays.asList(io.micrometer.core.instrument.Tag.of("input", "100"),
                         io.micrometer.core.instrument.Tag.of("output", "method executed")));
-        Assertions.assertTrue(isMeterRecorded("timer", 0D, expectedTags,MeterType.TIMER));
+        Assertions.assertTrue(isMeterRecorded("timer", 0D, expectedTags, MeterType.TIMER));
     }
 
     @Test
@@ -46,7 +46,16 @@ public class AnnotationsTest {
         testClassService.testCounterMeterType();
         List<io.micrometer.core.instrument.Tag> expectedTags = new ArrayList<>(
                 Arrays.asList(io.micrometer.core.instrument.Tag.of("status", "counting...")));
-        Assertions.assertTrue(isMeterRecorded("counter", 2D, expectedTags,MeterType.COUNTER));
+        Assertions.assertTrue(isMeterRecorded("counter", 2D, expectedTags, MeterType.COUNTER));
+    }
+
+    @Test
+    void testErrorRecordingTime() {
+        testClassService.testGaugeWithRecordingTimeError();
+        List<io.micrometer.core.instrument.Tag> expectedTags = new ArrayList<>(
+                Arrays.asList(io.micrometer.core.instrument.Tag.of("status", "Error"),
+                        io.micrometer.core.instrument.Tag.of(  "outcome","java.lang.RuntimeException: testing exception")));
+        Assertions.assertTrue(isMeterRecorded("GaugeWithError", 0D, expectedTags, MeterType.GAUGE));
     }
 
     private boolean isMeterRecorded(String meterName, double meterValue, List<Tag> expectedTags, MeterType meterType) {
@@ -59,7 +68,7 @@ public class AnnotationsTest {
                     break;
                 }
             }
-        if ((!meterType.equals(MeterType.TIMER) &&!equalValues) || actualMeter.isEmpty() || !checkTags(expectedTags, actualMeter.get()))
+        if ((!meterType.equals(MeterType.TIMER) && !equalValues) || actualMeter.isEmpty() || !checkTags(expectedTags, actualMeter.get()))
             return false;
         return true;
     }//io.micrometer.core.instrument.Tag.of("testTag","test")
@@ -71,7 +80,7 @@ public class AnnotationsTest {
         for (int i = 0; i < expectedTags.size(); i++) {
             boolean tagFound = false;
             for (int j = 0; j < meterActualTags.size(); j++) {
-                if ((expectedTags.get(i).getKey().equals(meterActualTags.get(i).getKey()) && expectedTags.get(i).getValue().equals(meterActualTags.get(i).getValue()))) {
+                if ((expectedTags.get(i).getKey().equals(meterActualTags.get(j).getKey()) && expectedTags.get(i).getValue().equals(meterActualTags.get(j).getValue()))) {
                     tagFound = true;
                     break;
                 }

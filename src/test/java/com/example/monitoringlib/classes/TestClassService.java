@@ -26,5 +26,11 @@ public class TestClassService {
             @Tag(name = "status", value = @Value(constant = "counting...", source = Source.CONSTANT))
     })
     public void testCounterMeterType(){}
-
+    @Meter(name="GaugeWithError",meterType = MeterType.GAUGE,recordingTime = RecordingTime.ERROR,tags = {
+            @Tag(name = "status", value = @Value(constant = "Error", source = Source.CONSTANT)),
+            @Tag(name="outcome",value = @Value(source = Source.OUTCOME))
+    })
+   public void testGaugeWithRecordingTimeError(){
+        throw new RuntimeException("testing exception");
+   }
 }
