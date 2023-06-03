@@ -12,5 +12,6 @@ import java.lang.annotation.Target;
 public @interface Value {
     Source source() default Source.NONE;
     String name() default "";
+    String constant() default "";
 
 }
